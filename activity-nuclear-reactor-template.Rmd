@@ -1,26 +1,37 @@
 ---
 title: "Activity: Nuclear Reactors"
-author: "YOUR NAME HERE"
+author: "Madeline Mucciolo"
 output: html_notebook
 ---
 
 ```{r}
 library(tidyverse)
-
 ```
+- Load *tidyverse* into the environment for later use.
 
 ## Scrape the Data 
 
 ```{r}
-#My code here.... 
+library(rvest)
 
-
+page <- "https://en.wikipedia.org/wiki/List_of_commercial_nuclear_reactors"
+tableList <- page %>%
+  read_html() %>%
+  html_nodes(css = "table") %>%
+  html_table(fill = TRUE)
 ```
+- Scraping the data from the Wiki Page and storing it in **tableList**.  
 
+```{r}
+Japan <- tableList[[21]]
+head(Japan)
+```
+- After searching through **tableList**, I found Japan to be the 21st element in the list. I took that data, and stored it in a new variable named **Japan**.  
 
 ## Your turn: In what ways is the table tidy? How is it not tidy? What’s different about it from a tidy table?
+- The table is tidy because each column is a variable with the same type of value for each row. Most of the rows represent the nuclear reactors [each case is the Name of the plant and the UnitNo. of that specific reactor].
 
-My answer here..... 
+- However, the table is not tidy because the first row does is a repeat of the column names, which means it does not represent the same underlying case as all of the other rows. Some variable names are long and have spaces.
 
 
 ## Your Turn: Plot Net Generation Capacity vs Construction Date
