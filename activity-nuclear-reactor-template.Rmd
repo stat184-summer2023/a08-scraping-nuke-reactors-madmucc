@@ -90,10 +90,12 @@ library(lubridate)
 - Loading the *lubridate* package into the environment to use in the next step.
 
 ```{r}
-Japan %>%
+Japan <-
+  Japan %>%
   mutate(reactor=as.numeric(reactor), netMW=as.numeric(netMW)) %>%
-  mutate(construction=dmy(construction), operation=dmy(operation), Closed=dmy(Closed)) %>%
-  str()
+  mutate(construction=dmy(construction), operation=dmy(operation), Closed=dmy(Closed))
+
+str(Japan)
 ```
 - I used *mutate()* to change the variables to their appropriate types.  
 - Now the data is fully cleaned and ready to be graphed.  
@@ -104,15 +106,74 @@ Japan %>%
 ggplot(data=Japan, aes(x=netMW, y=construction, color=model)) +
   geom_point()
 ```
-- From that graph above, although there is no clear correlation between when a reactor was constructed and its net MW produced, the reactors with the highest netMW were all of the same model types; either Mitsubishi 2-loop or 3-loop, BWR-4 or BWR-5. On the opposite end, all of the reactors with the lowest outputs, were Magnox models.
+- From that graph above, on average, the newer the reactor was built, to more netMW it produces. The graph also sheds light on the popularity of different reactors during different times. ***ABWR*** models are the most recently used and also produce the most output. 
 
 ## Your Turn: Scrape & Clean China Data (then merge with Japan)
 
 ```{r}
-#my code here... 
-
+China <- tableList[[10]]
+head(China)
 ```
+- First finding China from the tabelList and looking at the data to see what needs to be cleaned.
 
+```{r}
+new_data_1 <- c(China[10][[1]][1], China[11][[1]][1], China[12][[1]][1], China[13][[1]][1], China[14][[1]][1], China[15][[1]][1], China[16][[1]][1], China[17][[1]][1], China[18][[1]][1])
+new_data_2 <- c(China[10][[1]][1], China[1][[1]][2], China[2][[1]][2], China[3][[1]][2], China[4][[1]][2], China[5][[1]][2], China[6][[1]][2], China[7][[1]][2], China[8][[1]][2])
+
+new_data_1
+new_data_2
+```
+- Capture the data from the first two lines that is out of place to insert in the correct spots.
+
+```{r}
+for(i in 1:9){China[i][[1]][1]<-new_data_1[i]}
+for(i in 1:9){China[i][[1]][2]<-new_data_2[i]}
+```
+```{r}
+China
+```
+- Now the first two lines have been replaced by the appropriate data. The extra columns on the end still need to be taken off, and the data still needs to be wrangled. 
+
+```{r}
+China <-
+  China %>%
+  select(Plantname, "UnitNo.", Model, Status, "Capacity(MW)", "Beginbuilding", "Commercialoperation", "Closed") %>%
+  rename(name = Plantname, 
+         reactor = "UnitNo.",
+         model = Model,
+         status = Status, 
+         netMW = "Capacity(MW)",
+         construction = "Beginbuilding",
+         operation = "Commercialoperation")
+
+head(China)
+```
+- The extra columns have been cut out and uniform names have been given to each.
+
+```{r}
+China <- 
+  China %>%
+  mutate(reactor=as.numeric(reactor), netMW=as.numeric(netMW)) %>%
+  mutate(construction=dmy(construction), operation=dmy(operation), Closed=dmy(Closed))
+
+str(China)
+```
+- After converting all of the variables to their appropriate types, we can append *Japan* and *China*.
+
+```{r}
+# adding country variable to each table
+China <-
+  China %>%
+  mutate("country" = "China")
+Japan <-
+  Japan %>%
+  mutate('country' = "Japan")
+
+# appending the tables
+Japan_China <- bind_rows(Japan, China)
+sample_n(Japan_China, 10)
+```
+- From the random sample of 10 rows, we can see that the new data frame *Japan_China* contains all of the reactors from both countries.
 
 
 ## Your Turn: Reconstruct Info Graphic of Japan Reactors (or other country of interest)
