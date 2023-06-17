@@ -95,17 +95,16 @@ Japan %>%
   mutate(construction=dmy(construction), operation=dmy(operation), Closed=dmy(Closed)) %>%
   str()
 ```
-- I used *mutate()* to change the variables to their apropriate types.  
+- I used *mutate()* to change the variables to their appropriate types.  
 - Now the data is fully cleaned and ready to be graphed.  
 
 ## Your Turn: Plot Net Generation Capacity vs Construction Date
 
 ```{r}
-#my code here 
-
-
+ggplot(data=Japan, aes(x=netMW, y=construction, color=model)) +
+  geom_point()
 ```
-
+- From that graph above, although there is no clear correlation between when a reactor was constructed and its net MW produced, the reactors with the highest netMW were all of the same model types; either Mitsubishi 2-loop or 3-loop, BWR-4 or BWR-5. On the opposite end, all of the reactors with the lowest outputs, were Magnox models.
 
 ## Your Turn: Scrape & Clean China Data (then merge with Japan)
 
