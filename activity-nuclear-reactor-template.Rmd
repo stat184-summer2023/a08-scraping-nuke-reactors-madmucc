@@ -34,6 +34,70 @@ head(Japan)
 - However, the table is not tidy because the first row does is a repeat of the column names, which means it does not represent the same underlying case as all of the other rows. Some variable names are long and have spaces.
 
 
+```{r}
+print(Japan[10][[1]][1])
+```
+- When scraping my data, not only did the column names duplicate into their own case, but added the first case on the end of that row. Because of this, I have 9 extra columns that only contain one row of data. However, I cannot delete this row altogether since it contains data. Unfortunaly, these columns do not have names (they are empty strings), so they cannot be directly called upon. After playing around, I found the syntax needed to extract the data from these columns, as seen above.  
+- To use this data, I will need to individually extract it all, and add them into a new vector. This vector can then be added into the correct columns in the data frame.  
+
+```{r}
+new_data <- c(Japan[10][[1]][1], Japan[11][[1]][1], Japan[13][[1]][1], Japan[14][[1]][1], Japan[15][[1]][1], Japan[16][[1]][1], Japan[17][[1]][1], Japan[18][[1]][1])
+new_data
+```
+- When creating this new vector, I did not include the data from column 3 (column 13 of the full data frame), since this column was already cut out for all the other cases.
+
+```{r}
+library(dplyr)
+colnames(Japan)
+```
+- Looking at column names for renaming purposes, since they differ from the original names the book provided.  
+
+```{r}
+names(Japan)[c(3)] <- c("type")
+
+Japan <-
+  Japan %>%
+  select(Plantname, "UnitNo.", Model, Status, "Capacity(MW)", "Beginbuilding", "Commercialoperation", "Closed") %>%
+  rename(name = Plantname, 
+         reactor = "UnitNo.",
+         model = Model,
+         status = Status, 
+         netMW = "Capacity(MW)",
+         construction = "Beginbuilding",
+         operation = "Commercialoperation")
+
+head(Japan)
+```
+- Now the variables have more uniform and usable names. Although the book completely removed the first row (to get rid of the doubled column names), since in my case I need to add **new_data** to the first row, I kept it for now.  
+
+```{r}
+for(i in 1:8){Japan[i][[1]][1]<-new_data[i]}
+```
+```{r}
+Japan
+```
+
+- After doing some data wrangling, the table is much easier to read, but still needs some adjustments. Many of the rows are not the appropriate type of variable. To fix this, I need to use *mutate()* on the columns that need fixed.
+
+```{r}
+str(Japan)
+```
+- After inspection using str(), it is known that all of the variables are written in the data as character type.
+
+```{r}
+library(lubridate)
+```
+- Loading the *lubridate* package into the environment to use in the next step.
+
+```{r}
+Japan %>%
+  mutate(reactor=as.numeric(reactor), netMW=as.numeric(netMW)) %>%
+  mutate(construction=dmy(construction), operation=dmy(operation), Closed=dmy(Closed)) %>%
+  str()
+```
+- I used *mutate()* to change the variables to their apropriate types.  
+- Now the data is fully cleaned and ready to be graphed.  
+
 ## Your Turn: Plot Net Generation Capacity vs Construction Date
 
 ```{r}
