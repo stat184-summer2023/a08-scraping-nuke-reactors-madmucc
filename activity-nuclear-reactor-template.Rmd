@@ -179,6 +179,16 @@ sample_n(Japan_China, 10)
 ## Your Turn: Reconstruct Info Graphic of Japan Reactors (or other country of interest)
 
 ```{r}
-#My code here
-
+Japan %>%
+  ggplot(aes(x=construction, y=name, color=status)) + geom_line() + geom_point()
 ```
+
+- In this graph, You can see the construction dates of different reactors at each location. The colors symbolize the status of the reactors (whether they are still operating or not). 
+
+
+
+
+
+
+
+
